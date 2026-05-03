@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart Nutrition Tracker is a personalized dashboard to track your daily calories, macros, and get smart meal recommendations.">
+    <title>Smart Nutrition Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Auth Modal -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-modal glass-panel">
+            <h2 id="authTitle">Welcome Back</h2>
+            <p id="authSubtitle" class="section-subtitle">Please log in to your account.</p>
+            
+            <form id="authForm">
+                <div class="input-group full-width">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required placeholder="Enter username">
+                </div>
+                <div class="input-group full-width">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="submit-btn" id="authSubmitBtn">Log In</button>
+            </form>
+            
+            <div class="auth-toggle">
+                <span id="authToggleText">Don't have an account?</span>
+                <button type="button" id="authToggleBtn" class="toggle-link-btn">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <header class="greeting-header">
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <img src="images/logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                    <div style="color: var(--color-primary); font-weight: 600; font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 1px;">Smart Nutrition Tracker</div>
+                </div>
+                <h1 id="greeting">Hello!</h1>
+                <p>Let's take a look at how you're fueling your body today.</p>
+            </div>
+            <div class="header-actions">
+                <div class="date-badge">
+                    <span id="currentDate">Today</span>
+                </div>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav glass-panel" style="margin-bottom: 2rem; padding: 0.5rem; display: flex; gap: 0.5rem;">
+            <button class="tab-btn active" data-tab="tabHome">Home</button>
+            <button class="tab-btn" data-tab="tabIdealMeals">Ideal Meals</button>
+            <button class="tab-btn" data-tab="tabAnalytics">Analytics</button>
+            <button class="tab-btn" data-tab="tabDescription">Description</button>
+            <button class="tab-btn" data-tab="tabFeedback">Feedback</button>
+        </nav>
+
+        <!-- TAB: Home -->
+        <div id="tabHome" class="tab-content active main-content">
+            <!-- Left Column: Summary and Chart -->
+            <div class="left-col">
+                <section class="summary-cards">
+                    <div class="card cal-card">
+                        <div class="card-header">
+                            <h3>Energy</h3>
+                            <span id="calTarget">0 / 2000 kcal</span>
+                        </div>
+                        <p id="totalCalories">0</p>
+                        <div class="progress-container"><div class="progress-fill" id="calProgress" style="width: 0%"></div></div>
+                    </div>
+                    <div class="card pro-card">
+                        <div class="card-header">
+                            <h3>Protein</h3>
+                            <span id="proTarget">0 / 150g</span>
+                        </div>
+                        <p id="totalProtein">0g</p>
+                        <div class="progress-container"><div class="progress-fill" id="proProgress" style="width: 0%"></div></div>
+                    </div>
+                    <div class="card carb-card">
+                        <div class="card-header">
+                            <h3>Carbs</h3>
+                            <span id="carbTarget">0 / 200g</span>
+                        </div>
+                        <p id="totalCarbs">0g</p>
+                        <div class="progress-container"><div class="progress-fill" id="carbProgress" style="width: 0%"></div></div>
+                    </div>
+                    <div class="card fat-card">
+                        <div class="card-header">
+                            <h3>Fat</h3>
+                            <span id="fatTarget">0 / 65g</span>
+                        </div>
+                        <p id="totalFat">0g</p>
+                        <div class="progress-container"><div class="progress-fill" id="fatProgress" style="width: 0%"></div></div>
+                    </div>
+                </section>
+
+                <section class="diary-section">
+                    <h2>Diary</h2>
+                    <p class="section-subtitle">Your logged meals for today</p>
+                    <table class="diary-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-right">kcal</th>
+                                <th class="text-right">Pro</th>
+                                <th class="text-right">Carb</th>
+                                <th class="text-right">Fat</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="foodList">
+                            <!-- Populated by JS -->
+                            <tr><td colspan="6" class="empty-diary">No foods logged yet.</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <!-- Right Column: Add Food and History -->
+            <div class="right-col">
+                <section class="add-food-section glass-panel">
+                    <h2>What did you eat?</h2>
+                    <p class="section-subtitle">Log your meal to update your daily progress.</p>
+                    <form id="foodForm">
+                        <div class="input-group full-width">
+                            <label for="foodName">Meal Name</label>
+                            <input type="text" id="foodName" required placeholder="e.g. Avocado Toast with Egg">
+                        </div>
+                        <div class="macros-grid">
+                            <div class="input-group">
+                                <label for="calories">Calories</label>
+                                <input type="number" id="calories" required min="0" placeholder="kcal">
+                            </div>
+                            <div class="input-group">
+                                <label for="protein">Protein</label>
+                                <input type="number" id="protein" required min="0" step="0.1" placeholder="g">
+                            </div>
+                            <div class="input-group">
+                                <label for="carbs">Carbs</label>
+                                <input type="number" id="carbs" required min="0" step="0.1" placeholder="g">
+                            </div>
+                            <div class="input-group">
+                                <label for="fat">Fat</label>
+                                <input type="number" id="fat" required min="0" step="0.1" placeholder="g">
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn">Log this meal</button>
+                    </form>
+                </section>
+
+                </section>
+            </div>
+        </div>
+
+        <!-- TAB: Ideal Meals -->
+        <div id="tabIdealMeals" class="tab-content">
+            <section class="suggestions-section glass-panel">
+                <h2>Smart Suggestions</h2>
+                <p class="section-subtitle">Personalized based on your history and today's macros.</p>
+                <div class="suggestion-list" id="suggestionList">
+                    <!-- Suggestions will go here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB: Analytics -->
+        <div id="tabAnalytics" class="tab-content">
+            <div class="analytics-section" style="margin-top: 0; border-top: none; padding-top: 0;">
+                <h2 style="margin-bottom: 1.5rem;">Weekly Analytics & Trends</h2>
+            <div class="analytics-grid">
+                <!-- Analytics Cards -->
+                <div class="analytics-cards">
+                    <div class="card glass-panel cal-card" style="margin-bottom: 0;">
+                        <h3>Weekly Average Calories</h3>
+                        <p id="avgWeeklyCals">0</p>
+                        <span>kcal / day</span>
+                    </div>
+                    <div class="card glass-panel fat-card" style="margin-bottom: 0;">
+                        <h3>Highest Calorie Food</h3>
+                        <p id="highestCalFoodName" style="font-size: 1.6rem; color: var(--text-main);">None</p>
+                        <span id="highestCalFoodAmount" style="font-size: 0.9rem; margin-top: 0.2rem;">0 kcal</span>
+                    </div>
+                </div>
+                <!-- Trend Chart -->
+                <div class="trend-chart-container glass-panel">
+                    <div class="canvas-wrapper">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TAB: Description -->
+        <div id="tabDescription" class="tab-content">
+            <div class="glass-panel description-panel">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <img src="images/fitness_header.png" alt="Healthy Meal" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+                </div>
+                <h2>About Smart Nutrition Tracker</h2>
+                <p class="section-subtitle">Your personal guide to healthy eating and fitness.</p>
+                
+                <div class="description-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; margin-top: 1.5rem;">
+                    <div style="color: var(--color-text-main); line-height: 1.7;">
+                        <p style="margin-bottom: 1rem;">Welcome to the <strong>Smart Nutrition Tracker</strong>. Achieving your fitness goals isn't just about spending hours in the gym; it's about giving your body the right fuel.</p>
+                        <p style="margin-bottom: 1rem;">This application is designed to help you stay on top of your daily nutrition goals effortlessly. Whether you are aiming to build muscle, lose weight, or simply maintain a healthy lifestyle, tracking your macros is the first step.</p>
+                        <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                            <li style="margin-bottom: 0.5rem;"><strong>Home Tab:</strong> Log your meals, view your daily progress against macro targets, and manage your daily diary.</li>
+                            <li style="margin-bottom: 0.5rem;"><strong>Ideal Meals:</strong> Get personalized, AI-driven meal suggestions based on your eating history and remaining macros for the day.</li>
+                            <li style="margin-bottom: 0.5rem;"><strong>Analytics:</strong> Track your weekly average calorie intake and visualize your nutrient trends over time.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <img src="images/fitness_workout.png" alt="Fitness Lifestyle" style="width: 100%; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Feedback -->
+        <div id="tabFeedback" class="tab-content">
+            <div class="glass-panel" style="max-width: 600px; margin: 0 auto;">
+                <h2 style="margin-bottom: 1rem;">We'd love to hear from you!</h2>
+                <p class="section-subtitle">Please let us know how we can improve Smart Nutrition Tracker.</p>
+                <form id="feedbackForm">
+                    <div class="input-group full-width">
+                        <label for="feedbackName">Name (Optional)</label>
+                        <input type="text" id="feedbackName" placeholder="Your name">
+                    </div>
+                    
+                    <div class="input-group full-width">
+                        <label>Rate your experience</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars">★</label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
+                        </div>
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label for="feedbackMessage">Your Feedback</label>
+                        <textarea id="feedbackMessage" required placeholder="Tell us what you think..." style="width: 100%; padding: var(--space-2) 1.2rem; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-main); font-size: var(--text-base); outline: none; min-height: 150px; resize: vertical; transition: all 0.2s ease;"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" id="feedbackSubmitBtn">Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
