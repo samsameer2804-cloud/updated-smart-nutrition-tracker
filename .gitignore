@@ -1,0 +1,33 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+build/
+*.log
+
+# Node / JavaScript
+node_modules/
+npm-debug.log
+dist/
+.cache/
+
+# IDE Files
+.idea/
+.vscode/
+*.iml
+*.suo
+*.swp
+
+# Docker
+.env
+.env.local
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Test results
+test-results/
+coverage/
